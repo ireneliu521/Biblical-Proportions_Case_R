@@ -1,0 +1,218 @@
+---
+title: "A Homework of Biblical Proportions"
+author: "Yun-Hui Liu"
+output: rmarkdown::github_document
+---
+
+In this HW, we will analyze the text of the bible. The ascii version resides in the file "ascii_bible.txt" on Camino. Use an editor to familiarize yourself with the structure of the file. Then perform the following operations, listed below as questions for you to answer. 
+
+## Q1: Read in the file using any R function you like and store each verse in a text array. After which print the top 20 verses. (Remove the top two lines which contain the title.)
+```{r}
+library(stringr)
+library(stringi)
+text<-readLines("ascii_bible.txt")
+text1<-text[setdiff(seq(1,length(text)),grep("Book",text))]
+empty_lines<-grepl('^\\s*$',text1)
+text2<-text1[! empty_lines]
+text3<-paste(stri_trim(text2),collapse=" ")
+
+bible<-str_split(text3,"[[:digit:]]{3}:[[:digit:]]{3} ")
+bible<-bible[[1]][-1]
+print(bible[1:20])
+```
+
+## Q2: How many verses are there in total? 
+```{r}
+print(length(bible))
+```
+
+## Q3: Each verse has the number "CCC:VVV" where CCC is the chapter number and VVV is the verse number. How many chapters are there? 
+```{r}
+empty_lines<-grepl('^\\s*$',text)
+book1<-text[! empty_lines]
+book2<-paste(stri_trim(book1),collapse=" ")
+book3<-as.list(str_split(book2,"Book [[:digit:]]{2}"))
+book4<-book3[[1]][-1]
+
+sum=0
+pattern1="[[:digit:]]{3}:"
+for (i in 1:length(book4)) {
+  chapters=length(unique(str_extract_all(book4[i],pattern = pattern1)[[1]]))
+  sum=sum+chapters
+}
+print(sum)
+```
+
+## Q4: Extract an array for the verse numbers, and also one for the verse text.
+```{r}
+pattern2="[[:digit:]]{3}:[[:digit:]]{3}"
+versenum<-str_extract_all(book4,pattern=pattern2)
+print(versenum[[1]][1:5])
+
+versetext<-bible
+print(head(versetext))
+```
+
+## Q5: Lower case all text.
+```{r}
+bible<-tolower(bible)
+```
+
+## Q6: Convert the text of all verses into a Corpus using the **tm** package. 
+```{r}
+library(tm)
+bible_corpus<-Corpus(VectorSource(bible))
+#print(bible_corpus)
+```
+
+## Q7: Remove all punctuation. Use a corpus function for this. How many unique words are there in the bible? 
+```{r}
+removepun<-tm_map(bible_corpus,removePunctuation)
+tdm1<-TermDocumentMatrix(removepun,control=list(wordLengths = c(1, Inf)))
+print(nrow(tdm1))
+```
+
+## Q8: Remove all stopwords. Now how many unique terms are there? 
+```{r}
+removestops<-tm_map(removepun,removeWords,stopwords("english"))
+tdm2<-TermDocumentMatrix(removestops,control=list(wordLengths = c(1, Inf)))
+print(nrow(tdm2))
+```
+
+## Q9: Now stem the text, to remove multiplicity of similar words of the same root. 
+```{r}
+library(SnowballC)
+stemmed<-tm_map(removestops,stemDocument)
+print(stemmed)
+```
+
+## Q10: How many distinct words are there in the bible, after stemming?
+```{r}
+tdm3<-TermDocumentMatrix(stemmed,control=list(wordLengths = c(1, Inf)))
+print(nrow(tdm3))
+```
+
+## Q11: Convert the TDM into a matrix and find the 50 most common words in the bible. 
+```{r}
+tdm4<-as.matrix(tdm3)
+commonwords<-sort(rowSums(tdm4),decreasing=TRUE)
+print(names(commonwords[1:50]))
+```
+
+## Q12: Make a wordcloud of the top 100 words in the bible. 
+```{r mappImage,screenshot.force=TRUE}
+library(wordcloud)
+top100<-sort(rowSums(tdm4),decreasing=TRUE)
+wordcloud(names(top100[1:100]),top100)
+```
+
+## Q13: Mood score the original text of the bible (before stemming)
+```{r}
+HIDict = readLines("inqdict.txt")
+dict_pos = HIDict[grep("Pos",HIDict)]
+poswords = NULL
+for (s in dict_pos) {
+    s = strsplit(s,"#")[[1]][1]
+    poswords = c(poswords,strsplit(s," ")[[1]][1])
+}
+dict_neg = HIDict[grep("Neg",HIDict)]
+negwords = NULL
+for (s in dict_neg) {
+    s = strsplit(s,"#")[[1]][1]
+    negwords = c(negwords,strsplit(s," ")[[1]][1])
+}
+
+library(tm)
+library(stringr)
+# Define read_web_page function
+read_web_page = function(url,cstem=0,cstop=0,ccase=0,cpunc=0,cflat=0) {
+    text = readLines(url)
+    text = text[setdiff(seq(1,length(text)),grep("<",text))]
+    text = text[setdiff(seq(1,length(text)),grep(">",text))]
+    text = text[setdiff(seq(1,length(text)),grep("]",text))]
+    text = text[setdiff(seq(1,length(text)),grep("}",text))]
+    text = text[setdiff(seq(1,length(text)),grep("_",text))]
+    text = text[setdiff(seq(1,length(text)),grep("\\/",text))]
+    ctext = Corpus(VectorSource(text))
+    if (cstem==1) { ctext = tm_map(ctext, stemDocument) }
+    if (cstop==1) { ctext = tm_map(ctext, removeWords, stopwords("english"))}
+    if (cpunc==1) { ctext = tm_map(ctext, removePunctuation) }
+    if (ccase==1) { ctext = tm_map(ctext, tolower) }
+    if (ccase==2) { ctext = tm_map(ctext, toupper) }
+    text = ctext
+    #CONVERT FROM CORPUS IF NEEDED
+    if (cflat>0) {
+        text = NULL
+        for (j in 1:length(ctext)) {
+            temp = ctext[[j]]$content
+            if (temp!="") { text = c(text,temp) }
+        }
+        text = as.array(text)
+    }
+    if (cflat==1) {
+        text = paste(text,collapse="\n")
+        text = str_replace_all(text, "[\r\n]" , " ")
+    }
+    result = text
+}
+```
+
+```{r}
+#mood scoring
+url<-"ascii_bible.txt"
+text<-read_web_page(url,cstem=0,cstop=0,ccase=2,cpunc=1,cflat=0)
+text<-str_replace_all(text,"nbsp"," ")
+text<-unlist(strsplit(text," "))
+
+posmatch<-match(text,poswords)
+numposmatch<-length(posmatch[which(posmatch>0)])
+negmatch<-match(text,negwords)
+numnegmatch<-length(negmatch[which(negmatch>0)])
+print(c(numposmatch,numnegmatch))
+```
+
+## Q14: Summarize the bible into less than 500 verses. (Or some fraction of the total number of verses, it's your choice.) Be super careful here as this may take a long time unless you are clever about it, or find some elegant way to speed things up!
+```{r}
+text_summary = function(text, n) {
+  m = length(text)  # No of sentences in input
+  jaccard = matrix(0,m,m)  #Store match index
+  for (i in 1:m) {
+    for (j in i:m) {
+      a = text[i]; aa = unlist(strsplit(a," "))
+      b = text[j]; bb = unlist(strsplit(b," "))
+      jaccard[i,j] = length(intersect(aa,bb))/
+                          length(union(aa,bb))
+      jaccard[j,i] = jaccard[i,j]
+    }
+  }
+  similarity_score = rowSums(jaccard)
+  res = sort(similarity_score, index.return=TRUE,
+          decreasing=TRUE)
+  idx = res$ix[1:n]
+  summary = text[idx]
+}
+```
+
+```{r}
+sum<-text_summary(book4,10)
+summ<-as.list(NULL)
+for(s in 1:length(sum)){
+  temp=unlist(strsplit(sum[s],"[[:digit:]{3}:[[:digit:]]{3}"))
+  summ[[s]]=text_summary(temp,50)
+}
+unlist(summ)
+print("SUMMARY")
+```
+
+## Q15: Find the main 3 topics in the bible, and the top 25 words in each topic. Can you find an interpretation of each topic?
+```{r}
+library(topicmodels)
+tdm = TermDocumentMatrix(bible_corpus,control=list(minWordLength=1))
+dtm=t(tdm)
+dtm = dtm[1:500,]
+
+res=LDA(dtm, 3, method="Gibbs", control = list(nstart = 5, seed = list(2003,5,63,100001,765), best = TRUE, burnin = 4000, iter = 2000, thin = 500))
+res.terms = as.matrix(terms(res,25))
+print(res.terms)
+```
+
