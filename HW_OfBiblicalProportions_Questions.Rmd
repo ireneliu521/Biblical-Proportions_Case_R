@@ -23,7 +23,6 @@ bible<-bible[[1]][-1]
 print(bible[1:20])
 ```
 
-
 ## Q2: How many verses are there in total? 
 ```{r}
 print(length(bible))
