@@ -1,3 +1,5 @@
+Summary
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 In this case, I will analyze the text of the bible with the following steps. I will first understand the structure of this bible text file and after some cleaning, I will create a wordcloud of the top 100 words in the bible. I will then further mood score the words and summarize the bible into less than 500 verses. Lastly, I will find the main 3 topics in the bible.
 
 1: Store each verse in a text array. Print the top 20 verses below. (Remove the top two lines which contain the title.)
