@@ -1,6 +1,6 @@
-In this case, I will analyze the text of the bible. Use an editor to familiarize yourself with the structure of the file. Then perform the following operations, listed below as questions for you to answer.
+In this case, I will analyze the text of the bible with the following steps. I will first understand the structure of this bible text file and after some cleaning, I will create a wordcloud of the top 100 words in the bible. I will then further mood score the words and summarize the bible into less than 500 verses. Lastly, I will find the main 3 topics in the bible.
 
-Q1: Read in the file using any R function you like and store each verse in a text array. After which print the top 20 verses. (Remove the top two lines which contain the title.)
+1: Store each verse in a text array. Print the top 20 verses below. (Remove the top two lines which contain the title.)
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ``` r
@@ -38,7 +38,7 @@ print(bible[1:20])
     ## [19] "And the evening and the morning were the fourth day. "                                                                                                                            
     ## [20] "And God said, Let the waters bring forth abundantly the moving creature that hath life, and fowl that may fly above the earth in the open firmament of heaven. "
 
-Q2: How many verses are there in total?
+2: How many verses are there in total?
 ---------------------------------------
 
 ``` r
@@ -47,7 +47,7 @@ print(length(bible))
 
     ## [1] 31102
 
-Q3: Each verse has the number "CCC:VVV" where CCC is the chapter number and VVV is the verse number. How many chapters are there?
+3: Each verse has the number "CCC:VVV" where CCC is the chapter number and VVV is the verse number. How many chapters are there?
 ---------------------------------------------------------------------------------------------------------------------------------
 
 ``` r
@@ -68,7 +68,7 @@ print(sum)
 
     ## [1] 1189
 
-Q4: Extract an array for the verse numbers, and also one for the verse text.
+4: Extract an array for the verse numbers, and also one for the verse text.
 ----------------------------------------------------------------------------
 
 ``` r
@@ -91,14 +91,14 @@ print(head(versetext))
     ## [5] "And God called the light Day, and the darkness he called Night. And the evening and the morning were the first day. "                           
     ## [6] "And God said, Let there be a firmament in the midst of the waters, and let it divide the waters from the waters. "
 
-Q5: Lower case all text.
+5: Lower case all text.
 ------------------------
 
 ``` r
 bible<-tolower(bible)
 ```
 
-Q6: Convert the text of all verses into a Corpus using the **tm** package.
+6: Convert the text of all verses into a Corpus using the **tm** package.
 --------------------------------------------------------------------------
 
 ``` r
@@ -112,7 +112,7 @@ bible_corpus<-Corpus(VectorSource(bible))
 #print(bible_corpus)
 ```
 
-Q7: Remove all punctuation. Use a corpus function for this. How many unique words are there in the bible?
+7: Remove all punctuation. Use a corpus function for this. How many unique words are there in the bible?
 ---------------------------------------------------------------------------------------------------------
 
 ``` r
@@ -123,7 +123,7 @@ print(nrow(tdm1))
 
     ## [1] 12689
 
-Q8: Remove all stopwords. Now how many unique terms are there?
+8: Remove all stopwords. Now how many unique terms are there?
 --------------------------------------------------------------
 
 ``` r
@@ -134,7 +134,7 @@ print(nrow(tdm2))
 
     ## [1] 12569
 
-Q9: Now stem the text, to remove multiplicity of similar words of the same root.
+9: Stem the text, to remove multiplicity of similar words of the same root.
 --------------------------------------------------------------------------------
 
 ``` r
@@ -147,7 +147,7 @@ print(stemmed)
     ## Metadata:  corpus specific: 1, document level (indexed): 0
     ## Content:  documents: 31102
 
-Q10: How many distinct words are there in the bible, after stemming?
+10: How many distinct words are there in the bible, after stemming?
 --------------------------------------------------------------------
 
 ``` r
@@ -157,7 +157,7 @@ print(nrow(tdm3))
 
     ## [1] 9143
 
-Q11: Convert the TDM into a matrix and find the 50 most common words in the bible.
+11: Convert the TDM into a matrix and find the 50 most common words in the bible.
 ----------------------------------------------------------------------------------
 
 ``` r
@@ -176,7 +176,7 @@ print(names(commonwords[1:50]))
     ## [43] "word"     "therefor" "everi"    "hast"     "name"     "make"    
     ## [49] "great"    "o"
 
-Q12: Make a wordcloud of the top 100 words in the bible.
+12: Make a wordcloud of the top 100 words in the bible.
 --------------------------------------------------------
 
 ``` r
@@ -189,10 +189,10 @@ library(wordcloud)
 top100<-sort(rowSums(tdm4),decreasing=TRUE)
 wordcloud(names(top100[1:100]),top100)
 ```
+Please refer to the Wordcloud of the top 100 words graph.
 
-![](HW_OfBiblicalProportions_Questions_files/figure-markdown_github/mappImage-1.png)
 
-Q13: Mood score the original text of the bible (before stemming)
+13: Mood score the original text of the bible (before stemming)
 ----------------------------------------------------------------
 
 ``` r
@@ -261,7 +261,7 @@ print(c(numposmatch,numnegmatch))
 
     ## [1] 50046 33928
 
-Q14: Summarize the bible into less than 500 verses. (Or some fraction of the total number of verses, it's your choice.) Be super careful here as this may take a long time unless you are clever about it, or find some elegant way to speed things up!
+14: Summarize the bible into less than 500 verses.
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ``` r
@@ -802,7 +802,7 @@ print("SUMMARY")
 
     ## [1] "SUMMARY"
 
-Q15: Find the main 3 topics in the bible, and the top 25 words in each topic. Can you find an interpretation of each topic?
+15: Find the main 3 topics in the bible, and print the top 25 words in each topic.
 ---------------------------------------------------------------------------------------------------------------------------
 
 ``` r
