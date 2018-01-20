@@ -1,2 +1,2 @@
 # Biblical Proportions
-Text analysis using biblical proportions
+Applying text analysis on the text of the bible.
