@@ -1,4 +1,4 @@
-In this project, we will analyze the text of the bible. The ascii version resides in the file "ascii\_bible.txt" on Camino. Use an editor to familiarize yourself with the structure of the file. Then perform the following operations, listed below as questions for you to answer.
+In this case, I will analyze the text of the bible. Use an editor to familiarize yourself with the structure of the file. Then perform the following operations, listed below as questions for you to answer.
 
 Q1: Read in the file using any R function you like and store each verse in a text array. After which print the top 20 verses. (Remove the top two lines which contain the title.)
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
