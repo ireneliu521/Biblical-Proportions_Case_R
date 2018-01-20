@@ -1,1 +1,2 @@
-# Biblical-proportions
+# Biblical Proportions
+Text analysis using biblical proportions
